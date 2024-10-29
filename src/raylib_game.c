@@ -21,6 +21,7 @@
 #include <stdio.h>                          // Required for: printf()
 #include <stdlib.h>                         // Required for: 
 #include <string.h>                         // Required for: 
+#include "game.h"
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -33,16 +34,6 @@
 #else
     #define LOG(...)
 #endif
-
-//----------------------------------------------------------------------------------
-// Types and Structures Definition
-//----------------------------------------------------------------------------------
-typedef enum { 
-    SCREEN_LOGO = 0, 
-    SCREEN_TITLE, 
-    SCREEN_GAMEPLAY, 
-    SCREEN_ENDING
-} GameScreen;
 
 // TODO: Define your custom data types here
 
