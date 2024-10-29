@@ -125,7 +125,7 @@ void UpdateDrawFrame(void)
         ClearBackground(RAYWHITE);
         
         // TODO: Draw your game screen here
-        DrawText("Welcome to raylib NEXT gamejam!", 150, 140, 30, BLACK);
+        DrawText("Hola DEATH. ¿Como estas?", 150, 140, 30, BLACK);
         DrawRectangleLinesEx((Rectangle){ 0, 0, screenWidth, screenHeight }, 16, BLACK);
         
     EndTextureMode();
