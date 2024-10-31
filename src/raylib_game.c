@@ -11,37 +11,14 @@
 *
 ********************************************************************************************/
 
-#include "../../raylib/src/raylib.h"
-
-#if defined(PLATFORM_WEB)
-    #define CUSTOM_MODAL_DIALOGS            // Force custom modal dialogs usage
-    #include <emscripten/emscripten.h>      // Emscripten library - LLVM to JavaScript compiler
-#endif
-
-#include <stdio.h>                          // Required for: printf()
-#include <stdlib.h>                         // Required for: 
-#include <string.h>                         // Required for: 
 #include "game.h"
-
-//----------------------------------------------------------------------------------
-// Defines and Macros
-//----------------------------------------------------------------------------------
-// Simple log system to avoid printf() calls if required
-// NOTE: Avoiding those calls, also avoids const strings memory usage
-#define SUPPORT_LOG_INFO
-#if defined(SUPPORT_LOG_INFO)
-    #define LOG(...) printf(__VA_ARGS__)
-#else
-    #define LOG(...)
-#endif
-
-// TODO: Define your custom data types here
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------
 static const int screenWidth = 800;
 static const int screenHeight = 450;
+StateData state;
 
 static RenderTexture2D target = { 0 };  // Render texture to render our game
 
@@ -71,6 +48,8 @@ int main(void)
     // NOTE: If screen is scaled, mouse input should be scaled proportionally
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    state = LoadState();
+    ChangeScreen(&state, SCREEN_LOGO);
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -88,6 +67,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     UnloadRenderTexture(target);
+    UnloadState(&state);
     
     // TODO: Unload all loaded resources at this point
 
@@ -107,18 +87,15 @@ void UpdateDrawFrame(void)
     //----------------------------------------------------------------------------------
     // TODO: Update variables / Implement example logic at this point
     //----------------------------------------------------------------------------------
-
+    Menu(&state);
     // Draw
     //----------------------------------------------------------------------------------
     // Render game screen to a texture, 
     // it could be useful for scaling or further shader postprocessing
     BeginTextureMode(target);
-        ClearBackground(RAYWHITE);
-        
+        ClearBackground(COLOR_1);
         // TODO: Draw your game screen here
-        DrawText("Welcome to raylib NEXT gamejam!", 150, 140, 30, BLACK);
-        DrawRectangleLinesEx((Rectangle){ 0, 0, screenWidth, screenHeight }, 16, BLACK);
-        
+        DrawTexturePro(state.textures[state.bg.textureIndex].tex, state.bg.source, state.bg.dest, state.bg.origin, state.bg.rotation, WHITE);
     EndTextureMode();
     
     // Render to screen (main framebuffer)
