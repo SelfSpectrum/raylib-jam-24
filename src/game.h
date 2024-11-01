@@ -8,9 +8,10 @@
     #include <emscripten/emscripten.h> // Emscripten library - LLVM to JavaScript compiler
 #endif
 
-#include <stdio.h>  // Required for: printf()
-#include <stdlib.h> // Required for: 
-#include <string.h> // Required for: 
+#include <stdio.h>  // Required for: sprintf()
+#include <stdlib.h> // Required for:
+#include <string.h> // Required for: strcpy()
+#include <math.h> // Required for: atan()
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -31,44 +32,60 @@
 #define COLOR_6  CLITERAL(Color){ 85, 90, 86, 255 }
 #define COLOR_7  CLITERAL(Color){ 62, 73, 67, 255 }
 #define COLOR_8  CLITERAL(Color){ 37, 43, 37, 255 }
+#define TEX_SIZE 4
+#define OBJ_SIZE 5
 
 // TODO: Define your custom data types here
 
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
 //----------------------------------------------------------------------------------
-typedef enum { 
-    SCREEN_LOGO = 0, 
-    SCREEN_TITLE = 1, 
-    SCREEN_ROOMFRONT = 2, 
-    SCREEN_ROOMLEFT = 3, 
-    SCREEN_ROOMRIGHT = 4, 
-    SCREEN_ROOMBACK = 5, 
-    SCREEN_ROOMTOP = 6, 
-    SCREEN_RADIO = 7, 
-    SCREEN_CONTROLPANE = 8, 
+typedef enum GameScreen
+{ 
+    SCREEN_LOGOBLINK = 0, 
+    SCREEN_LOGOLEFTTOP = 1, 
+    SCREEN_LOGORIGHTBOT = 2, 
+    SCREEN_LOGOLETTER = 3, 
+    SCREEN_TITLE, 
+    SCREEN_ROOM, 
+    SCREEN_CEILING, 
+    SCREEN_RADIO, 
+    SCREEN_CONTROLPANEL, 
     SCREEN_ENDING
 } GameScreen;
 
-typedef struct SafeTexture {
-    Texture2D tex;
-    bool init;
-} SafeTexture;
-typedef struct Sprite {
+typedef struct Sprite
+{
     int textureIndex; // Índice de la textura en el array del estado para extraer el sprite
     Rectangle source; // Origen del sprite dentro de la textura
     Rectangle dest; // Rectángulo de destino, que establece posición y escala del sprite
     Vector2 origin; // Posición del pivote en la textura
     float rotation; // Rotacion aplicada a la textura respecto al pivote
-    bool shader; // ¿Dibujar animable dentro del modo sombreador?
 } Sprite;
-typedef struct StateData {
+typedef struct Interactuable
+{
+    Sprite sprite; // Sprite del objeto interactuable
+    Sprite spriteOn; // Sprite del objeto interactuable
+    bool isHover; // Si es que el cursor está flotando por encima del objeto
+    bool isValid; // Si es que este es un objeto válido para dibujar e interactuar
+} Interactuable;
+typedef struct StateData
+{
     GameScreen screen;
-    SafeTexture textures[4];
+    // Muy útil para la animación del logo
+    int logoPositionX;
+    int logoPositionY;
+    int framesCounter; // Contador de frames, útil para cosas temporizadas
+    int letterCount; // Contador de letras, útil para presentar cosas letra a letra
+    Rectangle sideRect; 
+    // Útil para el juego en general
+    Texture textures[TEX_SIZE]; // Texturas
+    Interactuable interactuable[OBJ_SIZE];
     Sprite bg; // Sprite para usar de fondo
-    int wall;
-    bool lookCeil;
-    bool onMachine;
+    int wall; // Pared la que se está viendo en cada momento
+    bool lookCeil; // Si es que está mirando al techo
+    bool onMachine; // Si es que se está mirando a alguna máquina
+    Vector2 mousePos; // Posición del cursor
 } StateData;
 
 StateData LoadState(void);
@@ -76,5 +93,10 @@ void UnloadState(StateData *state);
 void Menu(StateData *state);
 void ChangeSelection(StateData *state);
 void ChangeScreen(StateData *state, GameScreen screen);
+void UpdateState(StateData *state);
+void UpdateInteractuable(StateData *state);
+void DrawState(StateData *state);
+void DrawInteractuable(StateData *state);
+float HeavisideEasing(float value, float step);
 
 #endif

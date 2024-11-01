@@ -49,7 +49,7 @@ int main(void)
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     state = LoadState();
-    ChangeScreen(&state, SCREEN_LOGO);
+    ChangeScreen(&state, SCREEN_LOGOBLINK);
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -85,25 +85,26 @@ void UpdateDrawFrame(void)
 {
     // Update
     //----------------------------------------------------------------------------------
-    // TODO: Update variables / Implement example logic at this point
+    // INFO: Aqui se actualizan las variables/Se implementa la lógica
     //----------------------------------------------------------------------------------
-    Menu(&state);
+    UpdateState(&state);
+
     // Draw
     //----------------------------------------------------------------------------------
-    // Render game screen to a texture, 
-    // it could be useful for scaling or further shader postprocessing
+    // Renderiza la pantalla de juego sobre una textura, útil para postprocesado o escalado
     BeginTextureMode(target);
         ClearBackground(COLOR_1);
         // TODO: Draw your game screen here
-        DrawTexturePro(state.textures[state.bg.textureIndex].tex, state.bg.source, state.bg.dest, state.bg.origin, state.bg.rotation, WHITE);
+        DrawState(&state);
     EndTextureMode();
     
     // Render to screen (main framebuffer)
     BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(COLOR_8);
         
         // Draw render texture to screen, scaled if required
         DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+        DrawFPS(10, 10);
 
         // TODO: Draw everything that requires to be drawn at this point, maybe UI?
 
