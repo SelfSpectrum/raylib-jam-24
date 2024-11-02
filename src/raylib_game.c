@@ -49,7 +49,7 @@ int main(void)
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     state = LoadState();
-    ChangeScreen(&state, SCREEN_LOGOBLINK);
+    ChangeScreen(&state, SCREEN_LOGO_ROOM);
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -91,22 +91,22 @@ void UpdateDrawFrame(void)
 
     // Draw
     //----------------------------------------------------------------------------------
-    // Renderiza la pantalla de juego sobre una textura, útil para postprocesado o escalado
+    // Renderiza los elementos del juego sobre una textura, útil para postprocesado o escalado
     BeginTextureMode(target);
-        ClearBackground(COLOR_1);
-        // TODO: Draw your game screen here
+        ClearBackground(state.bgColor);
+        // TODO: Desde aquí hasta el End se puede dibujar
         DrawState(&state);
     EndTextureMode();
     
-    // Render to screen (main framebuffer)
+    // Renderizar en la pantalla (main framebuffer)
     BeginDrawing();
         ClearBackground(COLOR_8);
-        
-        // Draw render texture to screen, scaled if required
+        // Dibuja la textura que contiene todos los elementos del propio juego
         DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
         DrawFPS(10, 10);
+        DrawText(state.screenId, 10, 28, 12, WHITE);
 
-        // TODO: Draw everything that requires to be drawn at this point, maybe UI?
+        // TODO: De aquí al End, dibuja todo lo que se deba dibujar, ¿Quizás interfaces?
 
     EndDrawing();
     //----------------------------------------------------------------------------------  

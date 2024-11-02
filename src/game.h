@@ -42,17 +42,26 @@
 //----------------------------------------------------------------------------------
 typedef enum GameScreen
 { 
-    SCREEN_LOGOBLINK = 0, 
-    SCREEN_LOGOLEFTTOP = 1, 
-    SCREEN_LOGORIGHTBOT = 2, 
-    SCREEN_LOGOLETTER = 3, 
-    SCREEN_TITLE, 
-    SCREEN_ROOM, 
-    SCREEN_CEILING, 
-    SCREEN_RADIO, 
-    SCREEN_CONTROLPANEL, 
-    SCREEN_ENDING
+    SCREEN_LOGO_BLINK = 0,
+    SCREEN_LOGO_LEFT_TOP = 1,
+    SCREEN_LOGO_RIGHT_BOTTOM = 2,
+    SCREEN_LOGO_LETTER = 3,
+    SCREEN_LOGO_CROMABER = 4,
+    SCREEN_TITLE = 5,
+    SCREEN_BRIEF = 6,
+    SCREEN_ROOM = 7,
+    SCREEN_CEILING = 8,
+    SCREEN_RADIO = 9,
+    SCREEN_CONTROL_PANEL = 10,
+    SCREEN_ENDING = 11
 } GameScreen;
+typedef enum ButtonState
+{
+    BUTTONSTATE_INVALID = 0,
+    BUTTONSTATE_OFF = 1,
+    BUTTONSTATE_HOVER = 2,
+    BUTTONSTATE_PRESS = 3
+} ButtonState;
 
 typedef struct Sprite
 {
@@ -66,8 +75,7 @@ typedef struct Interactuable
 {
     Sprite sprite; // Sprite del objeto interactuable
     Sprite spriteOn; // Sprite del objeto interactuable
-    bool isHover; // Si es que el cursor está flotando por encima del objeto
-    bool isValid; // Si es que este es un objeto válido para dibujar e interactuar
+    ButtonState state; // Si es que este es un objeto válido para dibujar e interactuar, Si es que el cursor está flotando por encima del objeto, Si el cursor está presionando el botón
 } Interactuable;
 typedef struct StateData
 {
@@ -82,15 +90,15 @@ typedef struct StateData
     Texture textures[TEX_SIZE]; // Texturas
     Interactuable interactuable[OBJ_SIZE];
     Sprite bg; // Sprite para usar de fondo
+    Color bgColor;
     int wall; // Pared la que se está viendo en cada momento
-    bool lookCeil; // Si es que está mirando al techo
-    bool onMachine; // Si es que se está mirando a alguna máquina
     Vector2 mousePos; // Posición del cursor
+    // Debug
+    char screenId[64]; 
 } StateData;
 
 StateData LoadState(void);
 void UnloadState(StateData *state);
-void Menu(StateData *state);
 void ChangeSelection(StateData *state);
 void ChangeScreen(StateData *state, GameScreen screen);
 void UpdateState(StateData *state);
