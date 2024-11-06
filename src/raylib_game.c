@@ -49,7 +49,7 @@ int main(void)
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     state = LoadState();
-    ChangeScreen(&state, SCREEN_LOGO_ROOM);
+    ChangeScreen(&state, SCREEN_LOGO_BLINK);
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -105,6 +105,7 @@ void UpdateDrawFrame(void)
         DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
         DrawFPS(10, 10);
         DrawText(state.screenId, 10, 28, 12, WHITE);
+	DrawText("Kurwa, aqui death", 10, 48, 12, WHITE);
 
         // TODO: De aquí al End, dibuja todo lo que se deba dibujar, ¿Quizás interfaces?
 
