@@ -11,46 +11,14 @@
 *
 ********************************************************************************************/
 
-#include "../../raylib/src/raylib.h"
-
-#if defined(PLATFORM_WEB)
-    #define CUSTOM_MODAL_DIALOGS            // Force custom modal dialogs usage
-    #include <emscripten/emscripten.h>      // Emscripten library - LLVM to JavaScript compiler
-#endif
-
-#include <stdio.h>                          // Required for: printf()
-#include <stdlib.h>                         // Required for: 
-#include <string.h>                         // Required for: 
-
-//----------------------------------------------------------------------------------
-// Defines and Macros
-//----------------------------------------------------------------------------------
-// Simple log system to avoid printf() calls if required
-// NOTE: Avoiding those calls, also avoids const strings memory usage
-#define SUPPORT_LOG_INFO
-#if defined(SUPPORT_LOG_INFO)
-    #define LOG(...) printf(__VA_ARGS__)
-#else
-    #define LOG(...)
-#endif
-
-//----------------------------------------------------------------------------------
-// Types and Structures Definition
-//----------------------------------------------------------------------------------
-typedef enum { 
-    SCREEN_LOGO = 0, 
-    SCREEN_TITLE, 
-    SCREEN_GAMEPLAY, 
-    SCREEN_ENDING
-} GameScreen;
-
-// TODO: Define your custom data types here
+#include "game.h"
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------
 static const int screenWidth = 800;
 static const int screenHeight = 450;
+StateData state;
 
 static RenderTexture2D target = { 0 };  // Render texture to render our game
 
@@ -80,6 +48,8 @@ int main(void)
     // NOTE: If screen is scaled, mouse input should be scaled proportionally
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    state = LoadState();
+    ChangeScreen(&state, SCREEN_LOGO_BLINK);
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -97,6 +67,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     UnloadRenderTexture(target);
+    UnloadState(&state);
     
     // TODO: Unload all loaded resources at this point
 
@@ -114,30 +85,29 @@ void UpdateDrawFrame(void)
 {
     // Update
     //----------------------------------------------------------------------------------
-    // TODO: Update variables / Implement example logic at this point
+    // INFO: Aqui se actualizan las variables/Se implementa la lógica
     //----------------------------------------------------------------------------------
+    UpdateState(&state);
 
     // Draw
     //----------------------------------------------------------------------------------
-    // Render game screen to a texture, 
-    // it could be useful for scaling or further shader postprocessing
+    // Renderiza los elementos del juego sobre una textura, útil para postprocesado o escalado
     BeginTextureMode(target);
-        ClearBackground(RAYWHITE);
-        
-        // TODO: Draw your game screen here
-        DrawText("Welcome to raylib NEXT gamejam!", 150, 140, 30, BLACK);
-        DrawRectangleLinesEx((Rectangle){ 0, 0, screenWidth, screenHeight }, 16, BLACK);
-        
+        ClearBackground(state.bgColor);
+        // TODO: Desde aquí hasta el End se puede dibujar
+        DrawState(&state);
     EndTextureMode();
     
-    // Render to screen (main framebuffer)
+    // Renderizar en la pantalla (main framebuffer)
     BeginDrawing();
-        ClearBackground(RAYWHITE);
-        
-        // Draw render texture to screen, scaled if required
+        ClearBackground(COLOR_8);
+        // Dibuja la textura que contiene todos los elementos del propio juego
         DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+        DrawFPS(10, 10);
+        DrawText(state.screenId, 10, 28, 12, WHITE);
+	DrawText("Kurwa, aqui death", 10, 48, 12, WHITE);
 
-        // TODO: Draw everything that requires to be drawn at this point, maybe UI?
+        // TODO: De aquí al End, dibuja todo lo que se deba dibujar, ¿Quizás interfaces?
 
     EndDrawing();
     //----------------------------------------------------------------------------------  
